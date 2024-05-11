@@ -15,6 +15,7 @@ const short down = 4;
 int current_x;                               // Текущие координаты
 int current_y;
 int length_snake = 10;                       // Длина змейки
+bool is_first_food = false;
 
 SSVQueueStackArray <int> snake_x;            // Координаты змейки по х
 SSVQueueStackArray <int> snake_y;            // Координаты змейки по y
@@ -29,58 +30,76 @@ void loop() {
   current_x = 5;                             // Задаем текущие координаты
   current_y = 5;
   int commands [94] = {1,1,1,4,4,            // Тестовые команды для змейки
-                       4,1,1,1,1, 
-                       1,2,2,2,3, 
-                       3,3,3,3,3, 
-                       3,3,4,4,4, 
-                       1,1,1,1,1, 
-                       2,2,2,1,1, 
-                       1,1,1,4,4, 
-                       4,4,4,1,1, 
-                       1,1,1,1,2, 
-                       2,2,2,1,1, 
-                       1,1,1,1,1,
-                       4,4,4,3,3,
-                       3,3,3,3,3,
-                       3,3,3,3,3,
-                       3,3,3,3,3,
-                       2,2,2,3,3,
-                       3,3,3,3,3,
-                       3,2,1,1};
+                      4,1,1,1,1, 
+                      1,2,2,2,3, 
+                      3,3,3,3,3, 
+                      3,3,4,4,4, 
+                      1,1,1,1,1, 
+                      2,2,2,1,1, 
+                      1,1,1,4,4, 
+                      4,4,4,1,1, 
+                      1,1,1,1,2, 
+                      2,2,2,1,1, 
+                      1,1,1,1,1,
+                      4,4,4,3,3,
+                      3,3,3,3,3,
+                      3,3,3,3,3,
+                      3,3,3,3,3,
+                      2,2,2,3,3,
+                      3,3,3,3,3,
+                      3,2,1,1};
+  int food_x;
+  int food_y;
+
+  if(!is_first_food){
+    food_x = random(32);
+    food_y = random(8);
+    matrix.drawPixel(food_x, food_y, HIGH);
+    is_first_food = true;
+  }
 
   for(int command : commands){
     snakeDirection(current_x, current_y, command);
+      if((food_x == current_x) && (food_y == current_y)){
+        length_snake++;
+        matrix.drawPixel(food_x, food_y, LOW);
+
+        food_x = random(32);
+        food_y = random(8);
+        matrix.drawPixel(food_x, food_y, HIGH);
+      }
+    }
   }
-}
+
 
 void snakeDirection(int x, int y, int direction) {   //Задаем направления для змейки
     switch (direction) {
     case right:
-			current_x++;
+      current_x++;
       snake(x, y);
-			break;
+      break;
     
     case down:
-			current_y--;
+      current_y--;
       snake(x, y);
-			break;
+      break;
     
     case left:
-			current_x--;
+      current_x--;
       snake(x, y);
-			break;
+      break;
 
-		case up:
-			current_y++;
+    case up:
+      current_y++;
       snake(x, y);
-			break;
+      break;
 
-		default: 
-			return;
+    default: 
+      return;
 	}
 }
 
-void snake(int x, int y){                            //отрисовка змейки
+void snake(int x, int y){                            //Отрисовка змейки
     matrix.drawPixel(x, y, HIGH);
     matrix.write();
     delay(200);
