@@ -21,13 +21,14 @@ int command = 1;
 int PIN_ANALOG_X = 0;
 int PIN_ANALOG_Y = 1;
 
-const short SPEED = 800;
-
 SSVQueueStackArray <int> snake_x;            // Координаты змейки по х
 SSVQueueStackArray <int> snake_y;            // Координаты змейки по y
 
-int food_rand_x = 32;
-int food_rand_y = 8;
+int food_x = 5;
+int food_y = 5;
+
+int food_rand_x = 15;
+int food_rand_y = 5;
 
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 
@@ -39,14 +40,20 @@ void setup() {
 
 void loop() {
 
-  int food_x;
-  int food_y;
-  
   if(is_first_food){
     food_x = random(food_rand_x);
     food_y = random(food_rand_y);
     matrix.drawPixel(food_x, food_y, HIGH);
     is_first_food = false;
+  }
+
+  if((food_x == current_x) && (food_y == current_y)){
+      matrix.drawPixel(food_x, food_y, LOW);
+      food_x = random(food_rand_x);
+      food_y = random(food_rand_y);
+      matrix.drawPixel(food_x, food_y, HIGH);
+
+      length_snake++;
   }
 
   int x = analogRead(PIN_ANALOG_X);
@@ -66,8 +73,6 @@ void loop() {
   }
 
 
-  snakeDirection(current_x, current_y, command);
-
   if(current_x < 0){
     current_x = 32;                 
   }
@@ -84,14 +89,7 @@ void loop() {
     current_y = 0;
   }
 
-  if((food_x == current_x) && (food_y == current_y)){
-      length_snake++;
-      matrix.drawPixel(food_x, food_y, LOW);
-
-      food_x = random(food_rand_x);
-      food_y = random(food_rand_y);
-      matrix.drawPixel(food_x, food_y, HIGH);
-    }
+  snakeDirection(current_x, current_y, command);
   }
 
 
@@ -99,25 +97,21 @@ void snakeDirection(int x, int y, int direction) {   //Задаем направ
     switch (direction) {
     case right:
       current_x++;
-      delay(SPEED);
       snake(x, y);
       break;
     
     case down:
       current_y--;
-      delay(SPEED);
       snake(x, y);
       break;
     
     case left:
       current_x--;
-      delay(SPEED);
       snake(x, y);
       break;
 
     case up:
       current_y++;
-      delay(SPEED);
       snake(x, y);
       break;
 
